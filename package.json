@@ -9,19 +9,29 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
+    "@types/react-owl-carousel": "^2.2.1",
+    "framer-motion": "^12.12.1",
+    "jwt-decode": "^4.0.0",
+    "next": "15.1.8",
+    "next-auth": "^4.24.11",
+    "owl.carousel": "^2.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.8"
+    "react-hook-form": "^7.56.4",
+    "react-icons": "^5.5.0",
+    "react-owl-carousel": "^2.3.3",
+    "zod": "^3.25.30"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
-    "@eslint/eslintrc": "^3"
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }

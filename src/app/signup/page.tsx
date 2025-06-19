@@ -4,20 +4,21 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import Header from '../components/Header';
-import BanerImage from '@/assate/Baner-03.png';
-import Image from 'next/image';
 import Footer from '../components/Footer';
+
+
 
 const SignupSchema = z.object({
     first_name: z.string().min(1, { message: 'First name is required' }),
-    middle_name: z.string().optional(),
     last_name: z.string().optional(),
-    dob: z.coerce.date().optional(),
-    gender: z.string().optional(),
-    phone_number: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
     email: z.string().email({ message: 'Invalid email' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+    confirm_password: z.string().min(6, { message: 'Please confirm your password' }),
+}).refine((data) => data.password === data.confirm_password, {
+    message: "Passwords don't match",
+    path: ["confirm_password"],
 });
 
 type SignupFormData = z.infer<typeof SignupSchema>;
@@ -29,15 +30,55 @@ export default function SignupPage() {
         register,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: { errors, isSubmitting },
+        setError,
     } = useForm<SignupFormData>({
         resolver: zodResolver(SignupSchema),
     });
 
-    const onSubmit = (data: SignupFormData) => {
-        console.log('Registering user:', data);
-        alert('Account created successfully!');
-        reset();
+    const onSubmit = async (data: SignupFormData) => {
+        try {
+            const payload = {
+                first_name: data.first_name,
+                last_name: data.last_name || '',
+                email: data.email,
+                password: data.password,
+                provider: "email", // Fixed value as "email"
+                providerId: "", // Empty string as per your requirement
+                captchaToken: "string", // Fixed value as "string"
+            };
+
+            const response = await axios.post(`http://localhost:5000/api/auth/register`, payload);
+
+            if (response.status === 201) {
+                alert('Account created successfully!');
+                reset();
+                // Optionally redirect to login or dashboard
+                // router.push('/login');
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    // Handle server validation errors
+                    if (error.response.data.errors) {
+                        const errors = error.response.data.errors;
+                        Object.keys(errors).forEach((key) => {
+                            setError(key as keyof SignupFormData, {
+                                type: "server",
+                                message: errors[key][0],
+                            });
+                        });
+                    } else {
+                        alert(error.response.data.message || 'Registration failed');
+                    }
+                } else {
+                    alert('Network error. Please try again.');
+                }
+            } else {
+                console.error('Unexpected error:', error);
+                alert('An unexpected error occurred. Please try again.');
+            }
+        }
     };
 
     const onCancel = () => {
@@ -53,17 +94,6 @@ export default function SignupPage() {
                     <Header />
                 </header>
                 <div className="h-20"></div>
-                {/* Banner Image Section */}
-                {/* <div className="relative w-full h-96 overflow-hidden">
-                    <Image
-                        src={BanerImage}
-                        alt="Login Illustration"
-                        fill
-                        className="object-cover object-center"
-                        priority
-                    />
-                </div> */}
-
                 {/* Registration Form Section */}
                 <div className="px-4 py-8 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                     <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
@@ -77,10 +107,39 @@ export default function SignupPage() {
                             <h3 className="text-xl font-medium text-gray-700 mb-6">
                                 Student Details:
                             </h3>
-
                             <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Right Column - Email/Password Form */}
                                 <div className="space-y-6 border-r border-gray-200 pr-6">
+                                    <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        {/* First Name */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                First Name <span className="text-red-600">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                {...register("first_name")}
+                                                className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.first_name ? "border-red-600" : "border-sky-500"
+                                                    }`}
+                                            />
+                                            {errors.first_name && (
+                                                <p className="text-red-600 text-sm mt-1">{errors.first_name.message}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Last Name */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Last Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                {...register("last_name")}
+                                                className="w-full border border-sky-500 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+
                                     {/* Email */}
                                     <div className="space-y-2">
                                         <label className="block text-sm font-medium text-gray-700">
@@ -90,7 +149,7 @@ export default function SignupPage() {
                                             type="email"
                                             {...register("email")}
                                             className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500
-                            ${errors.email ? 'border-red-600' : 'border-sky-500'}`}
+                                           ${errors.email ? 'border-red-600' : 'border-sky-500'}`}
                                         />
                                         {errors.email && (
                                             <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
@@ -120,18 +179,23 @@ export default function SignupPage() {
                                         </label>
                                         <input
                                             type="password"
-                                            name="confirm_password"
-                                            className="w-full border border-sky-500 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            {...register("confirm_password")}
+                                            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500
+                            ${errors.confirm_password ? 'border-red-600' : 'border-sky-500'}`}
                                         />
+                                        {errors.confirm_password && (
+                                            <p className="text-red-600 text-sm mt-1">{errors.confirm_password.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Form Buttons */}
                                     <div className="flex flex-col sm:flex-row gap-4 mt-8">
                                         <button
                                             type="submit"
-                                            className="flex-1 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-500 ease-in-out transform hover:scale-105"
+                                            disabled={isSubmitting}
+                                            className={`flex-1 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-500 ease-in-out transform hover:scale-105 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                                         >
-                                            Submit
+                                            {isSubmitting ? 'Processing...' : 'Submit'}
                                         </button>
 
                                         <button
@@ -160,9 +224,6 @@ export default function SignupPage() {
                                         Continue with Google
                                     </button>
                                 </div>
-
-
-
                             </form>
                         </div>
                     </div>

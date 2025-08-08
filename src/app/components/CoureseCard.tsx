@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { FaCloudDownloadAlt, FaAward, FaClock, FaUserGraduate } from 'react-icons/fa';
-
+import Link from "next/link";
 type IconType = "cloud-download-alt" | "award" | "clock" | "user-graduate";
 
 interface CourseDetail {
@@ -36,47 +36,58 @@ const CourseBox: React.FC<CourseBoxProps> = ({ level, title, type, image, descri
   };
 
   return (
-    <div className="w-full max-w-[360px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      {/* Course Image */}
-      <div className="h-48 overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          loading="lazy"
-        />
-      </div>
+    
+    
 
-      <div className="p-6">
-        {/* Badge and Title */}
-        <div className="flex justify-between items-start mb-3">
-          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${type === "Premium" ? "bg-yellow-100 text-yellow-800" :
-            type === "Standard" ? "bg-blue-100 text-blue-800" :
-              "bg-green-100 text-green-800"
-            }`}>
-            {type}
-          </span>
-        </div>
-
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{title}</h2>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{description}</p>
-
-        {/* Details Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {details.map((detail, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              {getIconComponent(detail.icon)}
-              <span className="text-xs font-medium text-gray-600">{detail.text}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Enroll Button */}
-        <button className="w-full bg-gradient-to-r from-[#080054] to-[#1aa5e5] hover:from-[#060046] hover:to-[#168bc7] text-white py-2.5 px-4 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02]">
-          Enroll Now
-        </button>
-      </div>
+<Link href={`/courses_details`} passHref>
+  <div className="cursor-pointer w-full max-w-[360px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    {/* Course Image */}
+    <div className="h-48 overflow-hidden">
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+        loading="lazy"
+      />
     </div>
+
+    <div className="p-6">
+      {/* Badge and Title */}
+      <div className="flex justify-between items-start mb-3">
+        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${type === "Premium"
+          ? "bg-yellow-100 text-yellow-800"
+          : type === "Standard"
+          ? "bg-blue-100 text-blue-800"
+          : "bg-green-100 text-green-800"
+          }`}>
+          {type}
+        </span>
+      </div>
+
+      <h2 className="text-xl font-bold text-gray-800 mb-2">{title}</h2>
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{description}</p>
+
+      {/* Details Grid */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        {details.map((detail, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            {getIconComponent(detail.icon)}
+            <span className="text-xs font-medium text-gray-600">{detail.text}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Enroll Button */}
+      <button
+        onClick={(e) => e.preventDefault()} // Prevent button click from navigating twice
+        className="w-full bg-gradient-to-r from-[#080054] to-[#1aa5e5] hover:from-[#060046] hover:to-[#168bc7] text-white py-2.5 px-4 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02]"
+      >
+        Enroll Now
+      </button>
+    </div>
+  </div>
+</Link>
+
   );
 };
 

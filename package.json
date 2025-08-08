@@ -11,6 +11,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@types/react-owl-carousel": "^2.2.1",
+    "axios": "^1.10.0",
     "framer-motion": "^12.12.1",
     "jwt-decode": "^4.0.0",
     "next": "15.1.8",
@@ -18,6 +19,7 @@
     "owl.carousel": "^2.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-google-recaptcha-v3": "^1.11.0",
     "react-hook-form": "^7.56.4",
     "react-icons": "^5.5.0",
     "react-owl-carousel": "^2.3.3",

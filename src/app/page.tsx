@@ -130,7 +130,7 @@ const HomePage: React.FC = () => {
 
 
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

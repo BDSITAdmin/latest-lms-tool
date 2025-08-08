@@ -1,90 +1,95 @@
 "use client";
 
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-
-
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const SignupSchema = z.object({
-    first_name: z.string().min(1, { message: 'First name is required' }),
-    last_name: z.string().optional(),
-    email: z.string().email({ message: 'Invalid email' }),
-    password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-    confirm_password: z.string().min(6, { message: 'Please confirm your password' }),
+  first_name: z.string().min(1, { message: "First name is required" }),
+  last_name: z.string().optional(),
+  email: z.string().email({ message: "Invalid email" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirm_password: z.string().min(6, { message: "Please confirm your password" }),
 }).refine((data) => data.password === data.confirm_password, {
-    message: "Passwords don't match",
-    path: ["confirm_password"],
+  message: "Passwords don't match",
+  path: ["confirm_password"],
 });
 
 type SignupFormData = z.infer<typeof SignupSchema>;
 
 export default function SignupPage() {
-    const router = useRouter();
+  const router = useRouter();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors, isSubmitting },
-        setError,
-    } = useForm<SignupFormData>({
-        resolver: zodResolver(SignupSchema),
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(SignupSchema),
+  });
 
-    const onSubmit = async (data: SignupFormData) => {
-        try {
-            const payload = {
-                first_name: data.first_name,
-                last_name: data.last_name || '',
-                email: data.email,
-                password: data.password,
-                provider: "email", // Fixed value as "email"
-                providerId: "", // Empty string as per your requirement
-                captchaToken: "string", // Fixed value as "string"
-            };
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      // ✅ Ensure recaptcha is ready
+      if (!executeRecaptcha) {
+        console.error("Recaptcha not yet available");
+        return;
+      }
 
-            const response = await axios.post(`http://localhost:5000/api/auth/register`, payload);
+      // ✅ Get captcha token
+      const captchaToken = await executeRecaptcha("signup_form");
 
-            if (response.status === 201) {
-                alert('Account created successfully!');
-                reset();
-                // Optionally redirect to login or dashboard
-                // router.push('/login');
-            }
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    // Handle server validation errors
-                    if (error.response.data.errors) {
-                        const errors = error.response.data.errors;
-                        Object.keys(errors).forEach((key) => {
-                            setError(key as keyof SignupFormData, {
-                                type: "server",
-                                message: errors[key][0],
-                            });
-                        });
-                    } else {
-                        alert(error.response.data.message || 'Registration failed');
-                    }
-                } else {
-                    alert('Network error. Please try again.');
-                }
-            } else {
-                console.error('Unexpected error:', error);
-                alert('An unexpected error occurred. Please try again.');
-            }
-        }
-    };
+      const payload = {
+        first_name: data.first_name,
+        last_name: data.last_name || "",
+        email: data.email,
+        password: data.password,
+        provider: "email",
+        providerId: "",
+        captchaToken, // send actual token
+      };
 
-    const onCancel = () => {
+      const response = await axios.post(
+        `http://localhost:5000/api/auth/register`,
+        payload
+      );
+
+      if (response.status === 201) {
+        alert("Account created successfully!");
         reset();
-        console.log('Form reset/canceled');
-    };
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.data.errors) {
+          const errors = error.response.data.errors;
+          Object.keys(errors).forEach((key) => {
+            setError(key as keyof SignupFormData, {
+              type: "server",
+              message: errors[key][0],
+            });
+          });
+        } else {
+          alert(error.response.data.message || "Registration failed");
+        }
+      } else {
+        console.error("Unexpected error:", error);
+        alert("An unexpected error occurred. Please try again.");
+      }
+    }
+  };
+
+  const onCancel = () => {
+    reset();
+    console.log("Form reset/canceled");
+  };
 
     return (
         <>

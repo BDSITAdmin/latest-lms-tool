@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
 
             <div className="min-h-screen bg-gray-50 pt-20">
 

@@ -12,6 +12,8 @@ import Footer from '../components/Footer';
 import LoginImage from '@/assate/image12(1).png';
 import axios from 'axios';
 import type { GoogleSignInButtonProps } from '@/app/components/GoogleSignInButton';
+import { useAuth } from '@/context/AuthContext';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 const GoogleSignInButton = dynamic<GoogleSignInButtonProps>(
     () => import('../components/GoogleSignInButton'),
@@ -30,6 +32,8 @@ const LoginPage = () => {
     const [authStatus, setAuthStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const { login } = useAuth();
+    const { executeRecaptcha } = useGoogleReCaptcha();
 
     const {
         register,
@@ -45,20 +49,36 @@ const LoginPage = () => {
         setAuthStatus('idle');
         setErrorMessage('');
 
+        
+
+        if (!executeRecaptcha) {
+            console.error("Recaptcha not yet available");
+            return;
+        }
+
         try {
-            // Hardcoded captchaToken as per your backend requirement
+            // ✅ Get real captcha token from Google
+            const captchaToken = await executeRecaptcha('login_form');
+
             const payload = {
                 email: data.email,
                 password: data.password,
-                captchaToken: "string", // hardcoded as requested
+                captchaToken, // 👈 Now real token
             };
 
             const response = await axios.post('http://localhost:5000/api/auth/login', payload);
 
             if (response.data.success) {
-                reset();
-                setAuthStatus('success');
-                router.push('/');
+                const userId = response.data.data.user?.id;
+                const token = response.data.data?.accessToken;
+                if (userId) {
+                    await login(userId, token);
+                    setAuthStatus('success');
+                    reset();
+                    router.push('/');
+                } else {
+                    throw new Error('User ID not returned in response.');
+                }
             } else {
                 setErrorMessage(response.data.message || 'Login failed');
                 setAuthStatus('error');
@@ -72,8 +92,11 @@ const LoginPage = () => {
 
     return (
         <>
+            {/* 🔹 your existing UI remains unchanged */}
+            {/* Just your form now calls onSubmit which uses captchaToken */}
             <div className="min-h-screen bg-gray-50">
-                <Navbar />
+                {/* <Navbar /> */}
+               <Navbar />
                 <div className="h-20"></div>
 
                 <section className="flex justify-center items-center py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-50">

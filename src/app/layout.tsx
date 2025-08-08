@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+import RecaptchaWrapper from "./components/reCaptcha";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +30,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        
+          <AuthProvider>
+            <Header />
+            <RecaptchaWrapper>
+            <main>{children}</main>
+          </RecaptchaWrapper>
+            <Footer />
+          </AuthProvider>
+        
       </body>
     </html>
   );

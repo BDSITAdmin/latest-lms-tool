@@ -56,10 +56,11 @@ const Header = () => {
 
           <div className="hidden md:flex items-center space-x-8">
             <div className="flex space-x-8">
-              <Link href="#" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>Home</Link>
-              <Link href="#" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>About Us</Link>
+              <Link href="/" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>Home</Link>
+              <Link href="/courses" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>All Courses</Link>
+              <Link href="/" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>About Us</Link>
               <Link href="#" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>Blog</Link>
-              <Link href="#" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>Contact</Link>
+              <Link href="/contact" className={`px-1 py-2 text-[16px] font-bold transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>Contact</Link>
             </div>
 
             <div className="flex items-center space-x-6 ml-6">
@@ -78,7 +79,7 @@ const Header = () => {
                     <FaChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''} ${isScrolled ? 'text-gray-600' : 'text-white'}`} />
                   </button>
 
-                 // In your Header component, update the dropdown section to properly display user data:
+                 {/* // In your Header component, update the dropdown section to properly display user data: */}
 
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-1 z-20 divide-y divide-gray-100 border border-gray-200">

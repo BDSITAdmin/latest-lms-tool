@@ -4,8 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import RecaptchaWrapper from "./components/reCaptcha";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,21 +24,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
           <AuthProvider>
             <Header />
             <RecaptchaWrapper>
-            <main>{children}</main>
-          </RecaptchaWrapper>
+              <main>{children}</main>
+            </RecaptchaWrapper>
             <Footer />
           </AuthProvider>
-        
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

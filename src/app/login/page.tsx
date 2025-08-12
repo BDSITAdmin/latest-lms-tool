@@ -207,7 +207,7 @@ const LoginPage = () => {
                                             </div>
                                         </div>
 
-                                        <GoogleSignInButton onSuccess={(email) => setValue('email', email)} />
+                                        <GoogleSignInButton onSuccess={(email: string) => console.log("Signed in:", email)} />
 
                                         <div className="text-center text-sm text-gray-600">
                                             <p>

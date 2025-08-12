@@ -4,7 +4,6 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import RecaptchaWrapper from "./components/reCaptcha";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
@@ -31,9 +30,7 @@ export default function RootLayout({
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
           <AuthProvider>
             <Header />
-            <RecaptchaWrapper>
-              <main>{children}</main>
-            </RecaptchaWrapper>
+            <main>{children}</main>
             <Footer />
           </AuthProvider>
         </GoogleOAuthProvider>
